@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 		if (argv[1][i] == argv[2][j])
 		{
 			k = 0;
-			while (argv[1][i] != argv[1][k])
+			while (argv[1][i] != argv[1][k] && argv[1][k] != '\0')
 				k++;
 			if (i == k)
 				write(1, &argv[1][i], 1);
