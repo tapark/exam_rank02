@@ -13,17 +13,17 @@ int ft_strlen(char *s)
 char *ft_strndup(char *s, int n)
 {
 	int i = 0;
-	char *t;
+	char *dest;
 
-	if(!(t = (char *)malloc(sizeof(char) * (n + 1))))
-		t = NULL;
+	if(!(dest = (char *)malloc(sizeof(char) * (n + 1))))
+		dest = NULL;
 	while (s[i] != '\0' && i < n)
 	{
-		t[i] = s[i];
+		dest[i] = s[i];
 		i++;
 	}
-	t[i] = '\0';
-	return (t);
+	dest[i] = '\0';
+	return (dest);
 }
 
 char *ft_strjoin(char *a, char *b)
@@ -32,40 +32,48 @@ char *ft_strjoin(char *a, char *b)
 	int len_b = ft_strlen(b);
 	int i;
 	int j;
-	char *join;
+	char *dest;
 
-	if(!(join = (char *)malloc(sizeof(char) * (len_a + len_b + 1))))
+	if(!(dest = (char *)malloc(sizeof(char) * (len_a + len_b + 1))))
 		return (NULL);
 	i = -1;
 	while (++i < len_a)
-		join[i] = a[i];
+		dest[i] = a[i];
 	j = -1;
 	while (++j <len_b)
-		join[i++] = b[j];
-	join[i] = '\0';
+		dest[i++] = b[j];
+	dest[i] = '\0';
 	free(a);
-	return (join);
+	return (dest);
 }
 
-int get_next_line(int fd, char **line)
+int get_next_line(char **line)
 {
 	char *buffer;
-	char *temp;
 	static char *data;
+	static char *temp;
 	int byte;
 
+	if (line == NULL)
+		return (-1);
 	if(!(buffer = (char *)malloc(sizeof(char) * 2)))
 		return (-1);
 	if (data == NULL)
 	{
 		data = ft_strndup("", 0);
-		while ((byte = read(fd, buffer, 1)) > 0)
+		while ((byte = read(0, buffer, 1)) > 0)
 		{
 			buffer[1] = '\0';
 			data = ft_strjoin(data, buffer);
 		}
+		temp = data;
 	}
 	free(buffer);
+	if (byte < 0)
+	{
+		free(data);
+		return (-1);
+	}
 	byte = 0;
 	while (data[byte] != '\n' && data[byte] != '\0')
 		byte++;
@@ -78,6 +86,7 @@ int get_next_line(int fd, char **line)
 	else if (data[byte] == '\0')
 	{
 		*line = ft_strndup(data, byte);
+		free(temp);
 		return (0);
 	}
 	return (0);
@@ -85,21 +94,15 @@ int get_next_line(int fd, char **line)
 
 int main(void)
 {
-	char 	*line;
-	int	ret;
-	int fd;
+	int		ret;
+	char	*line;
 
 	line = NULL;
-	fd = open("text.txt", O_RDONLY);
-	while ((ret = get_next_line(fd, &line)) > 0)
+	while ((ret = get_next_line(&line)) > 0)
 	{
 		printf("%d %s\n", ret, line);
 		free(line);
-		line = NULL;
 	}
 	printf("%d %s\n", ret, line);
 	free(line);
-	while (1)
-	{
-	}
 }

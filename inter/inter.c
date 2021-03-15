@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	while (argv[1][i] != '\0')
 	{
 		j = 0;
-		while (argv[2][j] != '\0' && argv[1][i] != argv[2][j])
+		while (argv[1][i] != argv[2][j] && argv[2][j] != '\0')
 			j++;
 		if (argv[1][i] == argv[2][j])
 		{
