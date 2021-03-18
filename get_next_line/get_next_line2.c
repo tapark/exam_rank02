@@ -46,46 +46,35 @@ char *ft_strjoin(char *a, char *b)
 
 int get_next_line(char **line)
 {
-	char *buffer;
+	char buffer[2];
 	static char *data;
-	static char *temp;
 	int byte;
+	int n;
 
 	if (line == NULL)
 		return (-1);
-	if (!(buffer = (char *)malloc(sizeof(char) * 2)))
-		return (-1);
-	if (data == NULL)
+	n = 0;
+	while ((byte = read(0, buffer, 1)) > 0)
 	{
-		data = ft_strndup("", 0);
-		while ((byte = read(0, buffer, 1)) > 0)
-		{
-			buffer[1] = '\0';
+		buffer[byte] = '\0';
+		if (data == NULL)
+			data = ft_strndup(buffer, 1);
+		else
 			data = ft_strjoin(data, buffer);
+		if (buffer[0] == '\n')
+		{
+			*line = ft_strndup(data, n);
+			free(data);
+			data = NULL;
+			return (1);
 		}
-		temp = data;
+		n = n + byte;
 	}
-	free(buffer);
 	if (byte < 0)
-	{
-		free(temp);
 		return (-1);
-	}
-	byte = 0;
-	while (data[byte] != '\n' && data[byte] != '\0')
-		byte++;
-	if (data[byte] == '\n')
-	{
-		*line = ft_strndup(data, byte);
-		data = data + byte + 1;
-		return (1);
-	}
-	else
-	{
-		*line = ft_strndup(data, byte);
-		free(temp);
-		return (0);
-	}
+	*line = data;
+	data = NULL;
+	return (0);
 }
 
 int main(void)
